@@ -1,0 +1,16 @@
+{{- if .Values.postgresql.enabled }}
+apiVersion: v1
+kind: Service
+metadata:
+  name: postgres
+  namespace: {{ .Release.Namespace }}
+  labels:
+    {{- include "cluma.postgresql.labels" . | nindent 4 }}
+spec:
+  selector:
+    {{- include "cluma.postgresql.selectorLabels" . | nindent 4 }}
+  ports:
+    - port: {{ .Values.postgresql.service.port }}
+      targetPort: {{ .Values.postgresql.service.port }}
+  type: {{ .Values.postgresql.service.type }}
+{{- end }}

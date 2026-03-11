@@ -1,0 +1,40 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: cluma-backend
+  namespace: {{ .Release.Namespace }}
+  labels:
+    {{- include "cluma.backend.labels" . | nindent 4 }}
+spec:
+  replicas: {{ .Values.backend.replicaCount }}
+  selector:
+    matchLabels:
+      {{- include "cluma.backend.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      labels:
+        {{- include "cluma.backend.selectorLabels" . | nindent 8 }}
+    spec:
+      serviceAccountName: {{ .Values.backend.serviceAccount.name }}
+      containers:
+      - name: cluma-backend
+        image: {{ include "cluma.backend.image" . }}
+        imagePullPolicy: {{ .Values.backend.image.pullPolicy }}
+        ports:
+        - containerPort: {{ .Values.backend.service.port }}
+        volumeMounts:
+        - name: env-file
+          mountPath: /app/.env
+          subPath: .env
+        - name: cluma-kube-config
+          mountPath: /root/.kube/config
+          subPath: config
+        resources:
+          {{- toYaml .Values.backend.resources | nindent 10 }}
+      volumes:
+      - name: env-file
+        configMap:
+          name: cluma-backend-env
+      - name: cluma-kube-config
+        secret:
+          secretName: cluma-kube-config

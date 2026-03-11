@@ -1,0 +1,18 @@
+{{- if .Values.registry.enabled }}
+apiVersion: v1
+kind: Service
+metadata:
+  name: docker-registry-service
+  namespace: registry
+  labels:
+    {{- include "cluma.registry.labels" . | nindent 4 }}
+spec:
+  selector:
+    {{- include "cluma.registry.selectorLabels" . | nindent 4 }}
+  ports:
+    - port: {{ .Values.registry.service.port }}
+      targetPort: {{ .Values.registry.service.port }}
+      nodePort: {{ .Values.registry.service.nodePort }}
+      protocol: TCP
+  type: {{ .Values.registry.service.type }}
+{{- end }}

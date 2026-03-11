@@ -1,0 +1,22 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: cluma-backend-env
+  namespace: {{ .Release.Namespace }}
+  labels:
+    {{- include "cluma.backend.labels" . | nindent 4 }}
+data:
+  .env: |
+    DB_USER={{ .Values.config.db.user }}
+    DB_PASSWORD={{ .Values.config.db.password }}
+    DB_HOST={{ include "cluma.postgresql.host" . }}
+    DB_PORT={{ .Values.config.db.port }}
+    DB_NAME={{ .Values.config.db.name }}
+    ENVIRONMENT={{ .Values.config.environment }}
+    {{- if .Values.config.cors.origins }}
+    BACKEND_CORS_ORIGINS={{ .Values.config.cors.origins | toJson }}
+    {{- else }}
+    BACKEND_CORS_ORIGINS=["http://{{ .Values.ingress.host }}","https://{{ .Values.ingress.host }}"]
+    {{- end }}
+    JWT_SECRET_KEY={{ .Values.config.jwt.secretKey }}
+    JWT_REFRESH_SECRET_KEY={{ .Values.config.jwt.refreshSecretKey }}

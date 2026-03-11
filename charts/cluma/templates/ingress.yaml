@@ -1,0 +1,93 @@
+{{/*
+  Ingress resources for Cluma application.
+  Contains: cluma-ingress (host-based), cluma-ingress-default (catch-all), grafana-ingress.
+*/}}
+{{- if .Values.ingress.enabled }}
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: cluma-ingress
+  namespace: {{ .Release.Namespace }}
+  labels:
+    {{- include "cluma.labels" . | nindent 4 }}
+  {{- with .Values.ingress.annotations }}
+  annotations:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+spec:
+  ingressClassName: {{ .Values.ingress.className }}
+  rules:
+    - host: {{ .Values.ingress.host }}
+      http:
+        paths:
+          - path: /api(/|$)(.*)
+            pathType: ImplementationSpecific
+            backend:
+              service:
+                name: cluma-backend
+                port:
+                  number: {{ .Values.backend.service.port }}
+          - path: /(.*)
+            pathType: ImplementationSpecific
+            backend:
+              service:
+                name: cluma-frontend
+                port:
+                  number: {{ .Values.frontend.service.port }}
+{{- end }}
+---
+{{- if and .Values.ingress.enabled .Values.ingress.defaultIngress.enabled }}
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: cluma-ingress-default
+  namespace: {{ .Release.Namespace }}
+  labels:
+    {{- include "cluma.labels" . | nindent 4 }}
+  {{- with .Values.ingress.annotations }}
+  annotations:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+spec:
+  ingressClassName: {{ .Values.ingress.className }}
+  rules:
+    - http:
+        paths:
+          - path: /api(/|$)(.*)
+            pathType: ImplementationSpecific
+            backend:
+              service:
+                name: cluma-backend
+                port:
+                  number: {{ .Values.backend.service.port }}
+          - path: /(.*)
+            pathType: ImplementationSpecific
+            backend:
+              service:
+                name: cluma-frontend
+                port:
+                  number: {{ .Values.frontend.service.port }}
+{{- end }}
+---
+{{- if .Values.ingress.grafana.enabled }}
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: grafana-ingress
+  namespace: {{ .Values.ingress.grafana.namespace }}
+  labels:
+    {{- include "cluma.labels" . | nindent 4 }}
+spec:
+  ingressClassName: {{ .Values.ingress.className }}
+  rules:
+    - host: {{ .Values.ingress.grafana.host }}
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: grafana
+                port:
+                  number: 3000
+{{- end }}

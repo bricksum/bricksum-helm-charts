@@ -1,0 +1,123 @@
+## Global settings
+global:
+  nodeIP: ""  # Required: K8s node IP (auto-detect if empty)
+
+## Frontend
+frontend:
+  replicaCount: 1
+  image:
+    repository: ""  # Override: {{ .Values.global.nodeIP }}:{{ .Values.registry.service.nodePort }}/cluma-frontend
+    tag: "v0.0.1"
+    pullPolicy: IfNotPresent
+  service:
+    type: ClusterIP
+    port: 3000
+  resources:
+    requests:
+      memory: "256Mi"
+      cpu: "100m"
+    limits:
+      memory: "512Mi"
+      cpu: "200m"
+
+## Backend
+backend:
+  replicaCount: 1
+  image:
+    repository: ""  # Override: {{ .Values.global.nodeIP }}:{{ .Values.registry.service.nodePort }}/cluma-backend
+    tag: "v0.0.1"
+    pullPolicy: IfNotPresent
+  service:
+    type: ClusterIP
+    port: 8000
+  resources:
+    requests:
+      memory: "256Mi"
+      cpu: "100m"
+    limits:
+      memory: "512Mi"
+      cpu: "200m"
+  ## ServiceAccount & RBAC
+  serviceAccount:
+    create: true
+    name: cluma-backend
+    clusterRoleBinding:
+      create: true
+      clusterRole: cluster-admin
+
+## Backend environment config
+config:
+  db:
+    user: postgres
+    password: postgres
+    host: ""  # auto: postgres.<namespace>.svc.cluster.local
+    port: "5432"
+    name: cluma_db
+  environment: production
+  cors:
+    origins: []  # auto-generated from ingress.host if empty
+  jwt:
+    secretKey: "_XqzVpYMyhMZqPYYJeoB2wPExkugJiblKnDyYIXWtco"
+    refreshSecretKey: "SG--QT-7fy1ADqcgR6PvAbnWRS_tY38sNWOcE2warEE"
+
+## PostgreSQL
+postgresql:
+  enabled: true
+  image:
+    repository: postgres
+    tag: "16"
+  service:
+    type: ClusterIP
+    port: 5432
+  persistence:
+    enabled: true
+    size: 20Gi
+    storageClass: ""  # Uses persistence.storageClass if empty
+    accessMode: ReadWriteOnce
+  auth:
+    username: postgres
+    password: postgres
+
+## Docker Registry
+registry:
+  enabled: true
+  image:
+    repository: registry
+    tag: "2"
+  service:
+    type: NodePort
+    port: 5000
+    nodePort: 32000
+  persistence:
+    enabled: true
+    size: 50Gi
+    storageClass: ""  # Uses persistence.storageClass if empty
+    accessMode: ReadWriteOnce
+  resources:
+    requests:
+      memory: "256Mi"
+      cpu: "250m"
+    limits:
+      memory: "512Mi"
+      cpu: "500m"
+
+## Ingress
+ingress:
+  enabled: true
+  className: nginx
+  host: cluma.internal
+  annotations:
+    nginx.ingress.kubernetes.io/use-regex: "true"
+  ## catch-all ingress (no host, for direct IP access)
+  defaultIngress:
+    enabled: true
+  ## Grafana ingress (in monitoring namespace)
+  grafana:
+    enabled: false
+    host: grafana.internal
+    namespace: monitoring
+
+## Persistence defaults
+persistence:
+  storageType: nfs-csi  # hostpath | nfs-csi
+  storageClass: nfs-csi

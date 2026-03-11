@@ -1,0 +1,25 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: cluma-frontend
+  namespace: {{ .Release.Namespace }}
+  labels:
+    {{- include "cluma.frontend.labels" . | nindent 4 }}
+spec:
+  replicas: {{ .Values.frontend.replicaCount }}
+  selector:
+    matchLabels:
+      {{- include "cluma.frontend.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      labels:
+        {{- include "cluma.frontend.selectorLabels" . | nindent 8 }}
+    spec:
+      containers:
+      - name: cluma-frontend
+        image: {{ include "cluma.frontend.image" . }}
+        imagePullPolicy: {{ .Values.frontend.image.pullPolicy }}
+        ports:
+        - containerPort: {{ .Values.frontend.service.port }}
+        resources:
+          {{- toYaml .Values.frontend.resources | nindent 10 }}

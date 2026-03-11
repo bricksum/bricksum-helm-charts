@@ -1,0 +1,12 @@
+apiVersion: v2
+name: cluma
+description: Cluma - Kubernetes Cluster Management Application
+type: application
+version: 0.1.0
+appVersion: "0.0.1"
+maintainers:
+  - name: bricksum
+keywords:
+  - cluma
+  - kubernetes
+  - cluster-management

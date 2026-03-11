@@ -1,0 +1,8 @@
+{{- if .Values.registry.enabled }}
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: registry
+  labels:
+    {{- include "cluma.registry.labels" . | nindent 4 }}
+{{- end }}

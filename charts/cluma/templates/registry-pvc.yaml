@@ -1,0 +1,20 @@
+{{- if and .Values.registry.enabled .Values.registry.persistence.enabled }}
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: registry-pvc
+  namespace: registry
+  labels:
+    {{- include "cluma.registry.labels" . | nindent 4 }}
+spec:
+  accessModes:
+    - {{ .Values.registry.persistence.accessMode }}
+  resources:
+    requests:
+      storage: {{ .Values.registry.persistence.size }}
+  {{- if .Values.registry.persistence.storageClass }}
+  {{- include "cluma.storageClass" .Values.registry.persistence.storageClass | nindent 2 }}
+  {{- else }}
+  {{- include "cluma.storageClass" .Values.persistence.storageClass | nindent 2 }}
+  {{- end }}
+{{- end }}

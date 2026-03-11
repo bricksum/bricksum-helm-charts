@@ -1,0 +1,64 @@
+
+Cluma has been deployed successfully!
+
+==========================================================
+ ACCESS
+==========================================================
+
+{{- if .Values.ingress.enabled }}
+  Application URL: http://{{ .Values.ingress.host }}
+{{- else }}
+  Ingress is disabled. Use port-forward to access the application:
+    kubectl port-forward svc/cluma-frontend {{ .Values.frontend.service.port }}:{{ .Values.frontend.service.port }} -n {{ .Release.Namespace }}
+{{- end }}
+
+==========================================================
+ DEFAULT CREDENTIALS
+==========================================================
+
+  Email:    admin@bricksum.com
+  Password: admin
+
+  ** Change the default password after first login. **
+
+==========================================================
+ /etc/hosts SETUP
+==========================================================
+
+{{- if .Values.ingress.enabled }}
+  Add the following entry to your /etc/hosts file
+  (replace <NODE_IP> with your Kubernetes node IP):
+
+    <NODE_IP>  {{ .Values.ingress.host }}
+{{- if .Values.ingress.grafana.enabled }}
+    <NODE_IP>  {{ .Values.ingress.grafana.host }}
+{{- end }}
+
+  On Linux/macOS:
+    echo "<NODE_IP>  {{ .Values.ingress.host }}" | sudo tee -a /etc/hosts
+{{- end }}
+
+==========================================================
+ VERIFY DEPLOYMENT
+==========================================================
+
+  Check the status of all pods:
+    kubectl get pods -n {{ .Release.Namespace }}
+
+  Check all resources:
+    kubectl get all -n {{ .Release.Namespace }}
+
+  Check ingress:
+    kubectl get ingress -n {{ .Release.Namespace }}
+
+==========================================================
+ RE-DEPLOY
+==========================================================
+
+  To upgrade/re-deploy the chart:
+    helm upgrade {{ .Release.Name }} <chart-path> -n {{ .Release.Namespace }} -f <values-file>
+
+  To uninstall:
+    helm uninstall {{ .Release.Name }} -n {{ .Release.Namespace }}
+
+==========================================================
