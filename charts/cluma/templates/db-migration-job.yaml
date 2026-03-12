@@ -1,0 +1,43 @@
+{{- if .Values.dbMigration.enabled }}
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: cluma-db-migration-{{ .Values.dbMigration.imageTag | default "latest" | replace "." "-" }}
+  namespace: {{ .Release.Namespace }}
+  labels:
+    {{- include "cluma.backend.labels" . | nindent 4 }}
+    app.kubernetes.io/component: db-migration
+  annotations:
+    "helm.sh/hook": pre-upgrade,pre-install
+    "helm.sh/hook-weight": "-5"
+    "helm.sh/hook-delete-policy": before-hook-creation
+spec:
+  backoffLimit: 3
+  ttlSecondsAfterFinished: 300
+  template:
+    metadata:
+      labels:
+        app: cluma-db-migration
+    spec:
+      restartPolicy: Never
+      containers:
+      - name: db-migration
+        image: {{ include "cluma.backend.image" . }}
+        command: ["/bin/bash", "-c"]
+        args:
+          - |
+            source /root/.local/bin/env
+            cd /app/cluma_db
+            uv run alembic upgrade head
+        env:
+          - name: DB_USER
+            value: {{ .Values.config.db.user | quote }}
+          - name: DB_PASSWORD
+            value: {{ .Values.config.db.password | quote }}
+          - name: DB_HOST
+            value: {{ include "cluma.postgresql.host" . | quote }}
+          - name: DB_PORT
+            value: {{ .Values.config.db.port | quote }}
+          - name: DB_NAME
+            value: {{ .Values.config.db.name | quote }}
+{{- end }}
