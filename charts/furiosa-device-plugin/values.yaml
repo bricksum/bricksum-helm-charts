@@ -1,0 +1,20 @@
+image:
+  repository: furiosaai/k8s-device-plugin
+  tag: "2026.1.0"
+  pullPolicy: IfNotPresent
+
+nodeSelector:
+  accelerator: furiosa
+
+tolerations:
+  - key: furiosa.ai/npu
+    operator: Exists
+    effect: NoSchedule
+
+resources:
+  limits:
+    cpu: 100m
+    memory: 128Mi
+  requests:
+    cpu: 50m
+    memory: 64Mi

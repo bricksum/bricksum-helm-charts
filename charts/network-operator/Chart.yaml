@@ -1,0 +1,10 @@
+apiVersion: v2
+name: network-operator
+description: Values wrapper for NVIDIA Network Operator
+version: 0.1.0
+appVersion: "v26.1.0"
+type: application
+dependencies:
+  - name: network-operator
+    version: "26.1.0"
+    repository: "https://helm.ngc.nvidia.com/nvidia"

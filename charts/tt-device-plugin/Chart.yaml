@@ -1,0 +1,5 @@
+apiVersion: v2
+name: tt-device-plugin
+description: Tenstorrent device plugin for K8s NPU resource discovery
+version: 0.1.0
+type: application

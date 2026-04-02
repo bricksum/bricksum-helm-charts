@@ -1,0 +1,50 @@
+network-operator:
+  # NicClusterPolicy configuration
+  nicClusterPolicy:
+    enabled: true
+
+  # OFED Driver - auto MOFED install
+  ofedDriver:
+    enabled: true
+    image: mofed
+    repository: nvcr.io/nvidia/mellanox
+    version: "24.10-0.7.0.0"
+
+  # RDMA Shared Device Plugin
+  rdmaSharedDevicePlugin:
+    enabled: true
+    resources:
+      - name: rdma_shared_device_a
+        vendors: ["15b3"]
+        devices: ["101b"]
+        ifNames: ["ens*f0"]
+    config: |
+      {
+        "configList": [
+          {
+            "resourceName": "rdma_shared_device_a",
+            "rdmaHcaMax": 63,
+            "selectors": {
+              "vendors": ["15b3"],
+              "deviceIDs": ["101b"],
+              "ifNames": ["ens*f0"]
+            }
+          }
+        ]
+      }
+
+  # Secondary Network
+  secondaryNetwork:
+    enabled: true
+    multus:
+      enabled: true
+      image: multus-cni
+      repository: ghcr.io/k8snetworkplumbingwg
+      version: "v4.1.2"
+
+  # Whereabouts IPAM
+  whereabouts:
+    enabled: true
+    image: whereabouts
+    repository: ghcr.io/k8snetworkplumbingwg
+    version: "v0.8.0"
