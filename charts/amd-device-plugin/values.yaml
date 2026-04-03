@@ -1,0 +1,20 @@
+image:
+  repository: rocm/k8s-device-plugin
+  tag: "1.31.0.9"
+  pullPolicy: IfNotPresent
+
+nodeSelector:
+  accelerator: amd
+
+tolerations:
+  - key: amd.com/gpu
+    operator: Exists
+    effect: NoSchedule
+
+resources:
+  limits:
+    cpu: 100m
+    memory: 128Mi
+  requests:
+    cpu: 50m
+    memory: 64Mi

@@ -1,0 +1,23 @@
+# EOS 전산실 테스트 클러스터 환경 변수
+cluster:
+  name: eos-cluster
+  nodes:
+    master: 172.16.251.20
+    gpuWorker: 172.16.251.21
+    mi300Worker: 172.16.253.100
+
+devicePlugins:
+  nvidia:
+    enabled: true
+  amd:
+    enabled: true
+  tenstorrent:
+    enabled: false
+  furiosa:
+    enabled: false
+
+networkOperator:
+  enabled: true
+
+monitoring:
+  enabled: true

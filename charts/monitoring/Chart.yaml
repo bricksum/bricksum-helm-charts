@@ -1,0 +1,10 @@
+apiVersion: v2
+name: monitoring
+description: Values wrapper for kube-prometheus-stack with GPU monitoring
+version: 0.1.0
+type: application
+dependencies:
+  - name: kube-prometheus-stack
+    version: "68.4.0"
+    repository: "https://prometheus-community.github.io/helm-charts"
+    alias: kubePrometheusStack
